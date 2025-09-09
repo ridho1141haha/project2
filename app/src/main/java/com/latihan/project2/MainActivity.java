@@ -8,12 +8,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText editTextPhone;
+    private EditText editTextName, editTextEmail, editTextPhone;
     private RadioButton rbMobile, rbRumah, rbKantor;
     private Button btnSubmit;
 
@@ -22,7 +23,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editTextPhone = findViewById(R.id.editText1);
+        editTextName = findViewById(R.id.editName);
+        editTextEmail = findViewById(R.id.editEmail);
+        editTextPhone = findViewById(R.id.editPhone);
         rbMobile      = findViewById(R.id.radioButton1);
         rbRumah       = findViewById(R.id.radioButton2);
         rbKantor      = findViewById(R.id.radioButton3);
@@ -38,7 +41,27 @@ public class MainActivity extends AppCompatActivity {
     private void handleSubmit() {
         hideKeyboard();
 
+        String name = editTextName.getText().toString().trim();
+        String email = editTextEmail.getText().toString().trim();
         String phone = editTextPhone.getText().toString().trim();
+
+        if (name.isEmpty()) {
+            editTextName.setError("Nama wajib diisi");
+            editTextName.requestFocus();
+            return;
+        }
+
+        if (email.isEmpty()) {
+            editTextEmail.setError("Email wajib diisi");
+            editTextEmail.requestFocus();
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            editTextEmail.setError("Email tidak valid");
+            editTextEmail.requestFocus();
+            return;
+        }
 
         if (phone.isEmpty()) {
             editTextPhone.setError("Nomor wajib diisi");
@@ -62,9 +85,16 @@ public class MainActivity extends AppCompatActivity {
             tipe = "Tidak dipilih";
         }
 
-        String msg = "Nomor: " + phone + " (" + tipe + ")";
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        // Show "Submit berhasil" Toast
+        Toast.makeText(this, "Submit berhasil", Toast.LENGTH_SHORT).show();
 
+        // Create Intent and pass data
+        Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+        intent.putExtra("NAME", name);
+        intent.putExtra("EMAIL", email);
+        intent.putExtra("PHONE", phone);
+        intent.putExtra("PHONE_TYPE", tipe);
+        startActivity(intent);
     }
 
     private void hideKeyboard() {
